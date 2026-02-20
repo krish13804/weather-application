@@ -1,5 +1,166 @@
-<html>
-    <body>
-        <h1>helloo</h1>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Application</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255,255,255,0.9);
+            max-width: 400px;
+            margin: 60px auto;
+            padding: 32px 24px;
+            border-radius: 18px;
+            box-shadow: 0 8px 24px rgba(44,62,80,0.15);
+            text-align: center;
+        }
+        h2 {
+            color: #2980b9;
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+        }
+        #cityInput {
+            width: 70%;
+            padding: 10px 12px;
+            border: 1px solid #b2bec3;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        #cityInput:focus {
+            border-color: #2980b9;
+        }
+        #getWeatherBtn {
+            padding: 10px 24px;
+            background: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #getWeatherBtn:hover {
+            background: #6dd5ed;
+            color: #2980b9;
+        }
+        #weatherOutput {
+            margin-top: 24px;
+            font-size: 1.1rem;
+            color: #2d3436;
+            background: #eaf6fb;
+            border-radius: 14px;
+            padding: 24px 18px;
+            min-height: 80px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .weather-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .weather-icon {
+            width: 64px;
+            height: 64px;
+        }
+        .weather-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+            width: 100%;
+            align-items: flex-start;
+        }
+        .weather-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.05em;
+        }
+        .weather-detail svg {
+            width: 22px;
+            height: 22px;
+            vertical-align: middle;
+        }
+        strong {
+            color: #2980b9;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Weather Application</h2>
+        <input type="text" id="cityInput" placeholder="Enter city name">
+        <button id="getWeatherBtn">Get Weather</button>
+        <div id="weatherOutput"></div>
+    </div>
+</body>
+<script>
+    const getWeatherBtn = document.getElementById('getWeatherBtn');
+    const cityInput = document.getElementById('cityInput');
+    getWeatherBtn.addEventListener('click', async () => {
+        const city = cityInput.value.trim();
+        const weatherOutput = document.getElementById('weatherOutput');
+        if (!city) {
+            weatherOutput.textContent = 'Please enter a city name.';
+            return;
+        }
+
+        weatherOutput.textContent = 'Loading...';
+
+        try {
+            const response = await fetch(
+                `http://api.weatherapi.com/v1/current.json?key=061b6895b76d449d818101526250109&q=${city}&aqi=no`
+            );
+            
+            if (!response.ok) {
+                weatherOutput.textContent = 'City not found or error fetching data.';
+                return;
+            }
+            const data = await response.json();
+            weatherOutput.innerHTML = `
+                <div class="weather-header">
+                    <img class="weather-icon" src="https:${data.current.condition.icon}" alt="Weather Icon">
+                    <span>${data.location.name}, ${data.location.country}</span>
+                </div>
+                <div class="weather-details">
+                    <div class="weather-detail">
+                        <svg fill="#2980b9" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>
+                        <span><strong>Temperature:</strong> ${data.current.temp_c}°C</span>
+                    </div>
+                    <div class="weather-detail">
+                        <svg fill="#2980b9" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-9 9c0 4.97 4.03 9 9 9s9-4.03 9-9a9 9 0 0 0-9-9zm0 16c-3.86 0-7-3.14-7-7a7 7 0 0 1 14 0c0 3.86-3.14 7-7 7zm0-10a3 3 0 0 0-3 3c0 1.66 1.34 3 3 3s3-1.34 3-3a3 3 0 0 0-3-3z"/></svg>
+                        <span><strong>Weather:</strong> ${data.current.condition.text}</span>
+                    </div>
+                    <div class="weather-detail">
+                        <svg fill="#2980b9" viewBox="0 0 24 24"><path d="M12 17c-3.31 0-6-2.69-6-6V7a6 6 0 0 1 12 0v4c0 3.31-2.69 6-6 6zm0-14a8 8 0 0 0-8 8v4c0 4.42 3.58 8 8 8s8-3.58 8-8V7a8 8 0 0 0-8-8z"/></svg>
+                        <span><strong>Humidity:</strong> ${data.current.humidity}%</span>
+                    </div>
+                    <div class="weather-detail">
+                        <svg fill="#2980b9" viewBox="0 0 24 24"><path d="M21 10.5a1 1 0 0 0-1-1H4a1 1 0 0 0 0 2h16a1 1 0 0 0 1-1zm-2 4a1 1 0 0 0-1-1H6a1 1 0 0 0 0 2h12a1 1 0 0 0 1-1zm-4 4a1 1 0 0 0-1-1H10a1 1 0 0 0 0 2h4a1 1 0 0 0 1-1z"/></svg>
+                        <span><strong>Wind Speed:</strong> ${data.current.wind_kph} kph</span>
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            weatherOutput.textContent = 'Error fetching weather data.';
+        }
+    });
+</script>
 </html>
