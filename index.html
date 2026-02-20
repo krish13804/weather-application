@@ -126,7 +126,7 @@
 
         try {
             const response = await fetch(
-                `http://api.weatherapi.com/v1/current.json?key=061b6895b76d449d818101526250109&q=${city}&aqi=no`
+                `https://api.weatherapi.com/v1/current.json?key=061b6895b76d449d818101526250109&q=${city}&aqi=no`
             );
             
             if (!response.ok) {
@@ -164,3 +164,4 @@
     });
 </script>
 </html>
+
